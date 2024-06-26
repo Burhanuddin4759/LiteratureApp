@@ -7,8 +7,6 @@ import CustomButton from '../../components/reusable/CustomButton'
 import { COLOR } from '../../enums/Styleguides'
 import Preferences from './Preferences'
 import AddStory from './AddStory'
-import { useDispatch } from 'react-redux'
-import { addHorizonCategories } from '../../redux/Actions'
 import Indicator from '../../components/custom/Indicator'
 
 const HorizonCategories = ({ route }) => {
