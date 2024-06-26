@@ -64,6 +64,7 @@ const Home = ({ navigation }) => {
                             title={'Daily Dose of Wisdom'}
                         />
                         <FlatList
+                            showsVerticalScrollIndicator={false}
                             data={data}
                             renderItem={renderView}
                             numColumns={2}
