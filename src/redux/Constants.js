@@ -1,0 +1,1 @@
+export const ADD_HORIZON_CATEGORIES = 'add_horizon_categories' 
