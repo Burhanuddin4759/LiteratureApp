@@ -5,6 +5,7 @@ import { COLOR } from '../../enums/Styleguides'
 import ExternalStylesheet from '../../enums/ExternalStylesheet'
 import Svg from '../../assets/icons/svg'
 import TextLable from '../../components/reusable/TextLable'
+import { useSelector } from 'react-redux'
 
 const Preferences = (props) => {
 
@@ -12,22 +13,39 @@ const Preferences = (props) => {
     // console.log('This is Props', subCategories)
 
     const flatListRef = useRef(null)
+    const reduxThemeData = useSelector((state) => state.reducer)
 
     const renderView = ({ item, index }) => {
         // console.log('item===>', item)
         return (
             <View style={styles.itemContainer}>
-                <View style={styles.container}>
+                <View style={[styles.container, {
+                    backgroundColor:
+                        reduxThemeData
+                            ?
+                            COLOR.DARK_BLUE_2
+                            :
+                            COLOR.WHITE
+                }]}>
                     <View style={styles.itemHeaderView}>
                         <TextLable
                             title={item.name}
-                            style={{ color: COLOR.BLACK, fontWeight: '800', fontSize: 15 }}
+                            style={[styles.itemTitle, {
+                                color: reduxThemeData
+                                    ?
+                                    COLOR.LIGHT_GREY
+                                    :
+                                    COLOR.BLACK
+                            }]}
                         />
                         <View style={{ flexDirection: 'row' }}>
-                            <Svg.RedHeart height={16} width={16} />
+                            <Svg.RedHeart />
                             <TextLable
                                 title={item.likes}
-                                style={{ fontSize: 11, marginLeft: 2, alignSelf: 'flex-start' }}
+                                style={[styles.itemLikesQty, {
+                                    color: reduxThemeData ?
+                                        COLOR.GREY : COLOR.BLACK
+                                }]}
                             />
                         </View>
                     </View>
@@ -36,7 +54,10 @@ const Preferences = (props) => {
                     >
                         <TextLable
                             title={item.description}
-                            style={{ fontSize: 14 }}
+                            style={{
+                                fontSize: 14,
+                                color: reduxThemeData ? COLOR.GREY : null
+                            }}
                         />
                     </ScrollView>
                     <View style={styles.btnRowsView}>
@@ -97,7 +118,7 @@ const Preferences = (props) => {
     }
 
     return (
-        <View style={{ flex: 1, justifyContent: 'flex-start',alignItems:'center' }}>
+        <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
             <FlatList
                 showsHorizontalScrollIndicator={false}
                 data={subCategories}
@@ -117,7 +138,7 @@ const styles = StyleSheet.create({
     container: {
         marginVertical: 12,
         height: Dimensions.get('screen').width * 1.25,
-        backgroundColor: '#fff',
+        // backgroundColor: '#fff',
         borderRadius: 12,
         elevation: 4,
         padding: 15
@@ -131,6 +152,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between'
+    },
+    itemTitle: {
+        fontWeight: '800',
+        fontSize: 15
+    },
+    itemLikesQty: {
+        fontSize: 10,
+        marginLeft: 2,
+        alignSelf: 'flex-start'
     },
     btnRowsView: {
         flexDirection: 'row',

@@ -7,6 +7,8 @@ import CustomButton from '../../components/reusable/CustomButton';
 import TextLable from '../../components/reusable/TextLable';
 import Svg from '../../assets/icons/svg';
 import Snackbar from 'react-native-snackbar';
+import { useSelector } from 'react-redux';
+import NetInfo from '@react-native-community/netinfo';
 
 const Signup = ({ navigation }) => {
 
@@ -15,6 +17,22 @@ const Signup = ({ navigation }) => {
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [showPass, setShowPass] = useState(true)
+
+    const reduxThemeData = useSelector((state) => state.reducer)
+
+    const handleRegister = () => {
+        NetInfo.fetch().then((state) => {
+            if (!state.isConnected) {
+                Snackbar.show({
+                    text: 'Internet Disconnected',
+                    duration: Snackbar.LENGTH_SHORT
+                })
+            }
+            else {
+                register()
+            }
+        })
+    }
 
     const register = async () => {
         if (fullname && email && password && confirmPassword && password === confirmPassword) {
@@ -29,7 +47,7 @@ const Signup = ({ navigation }) => {
                         full_name: fullname,
                         email: email,
                         password: password,
-                        con_password: confirmPassword
+                        con_password: confirmPassword,
                     })
                 })
                 const json = await response.json()
@@ -47,7 +65,7 @@ const Signup = ({ navigation }) => {
                 }
                 else {
                     Snackbar.show({
-                        text:"Please check your data",
+                        text: "Please check your data",
                         duration: Snackbar.LENGTH_SHORT,
                         action: {
                             text: 'undo',
@@ -79,7 +97,11 @@ const Signup = ({ navigation }) => {
 
     return (
         <View style={ExternalStylesheet.container}>
-            <View style={styles.innerContainer}>
+            <View style={[styles.innerContainer, {
+                backgroundColor: reduxThemeData
+                    ? COLOR.DARK_BLUE
+                    : COLOR.WHITE
+            }]}>
                 <View style={styles.imgView}>
                     <Image
                         source={require('../../assets/images/app_icon.png')}
@@ -89,49 +111,126 @@ const Signup = ({ navigation }) => {
                 <View style={styles.centeredView}>
                     <TextLable
                         title="Register"
-                        style={styles.mainText}
+                        style={[styles.mainText, {
+                            color: reduxThemeData ? COLOR.GREY : COLOR.BLACK
+                        }]}
                     />
                     <View>
                         <View style={styles.inputMainView}>
                             <TextLable
                                 title="Name"
-                                style={styles.blackText}
+                                style={{
+                                    color: reduxThemeData
+                                        ? COLOR.GREY
+                                        : COLOR.BLACK
+                                }}
                             />
-                            <View style={styles.inputView}>
+                            <View style={[styles.inputView, {
+                                backgroundColor: reduxThemeData
+                                    ? COLOR.DARK_BLUE_2
+                                    : COLOR.WHITE,
+                                borderWidth: reduxThemeData
+                                    ? 0.5 : 0.5,
+                                borderColor: reduxThemeData
+                                    ? COLOR.ORANGE : null,
+                                color: reduxThemeData
+                                    ? COLOR.GREY : null
+                            }]}>
                                 <CustomInput
                                     holder="Enter your full name"
-                                    style={{ flex: 1 }}
+                                    style={{
+                                        flex: 1,
+                                        backgroundColor: reduxThemeData
+                                            ? COLOR.DARK_BLUE_2
+                                            : COLOR.WHITE,
+                                        color: reduxThemeData
+                                            ? COLOR.GREY : null
+                                    }}
                                     onChangeText={(txt) => setFullName(txt)}
                                     value={fullname}
+                                    placeholderTextColor={
+                                        reduxThemeData
+                                            ? COLOR.GREY : null
+                                    }
                                 />
                             </View>
                         </View>
                         <View style={styles.inputMainView}>
                             <TextLable
                                 title="Email"
-                                style={styles.blackText}
+                                style={{
+                                    color: reduxThemeData
+                                        ? COLOR.GREY
+                                        : COLOR.BLACK
+                                }}
                             />
-                            <View style={styles.inputView}>
+                            <View style={[styles.inputView, {
+                                backgroundColor: reduxThemeData
+                                    ? COLOR.DARK_BLUE_2
+                                    : COLOR.WHITE,
+                                borderWidth: reduxThemeData
+                                    ? 0.5 : 0.5,
+                                borderColor: reduxThemeData
+                                    ? COLOR.ORANGE : null,
+                                color: reduxThemeData
+                                    ? COLOR.GREY : null
+                            }]}>
                                 <CustomInput
                                     holder="Enter your email"
-                                    style={{ flex: 1 }}
+                                    style={{
+                                        flex: 1,
+                                        backgroundColor: reduxThemeData
+                                            ? COLOR.DARK_BLUE_2
+                                            : COLOR.WHITE,
+                                        color: reduxThemeData
+                                            ? COLOR.GREY : null
+                                    }}
                                     onChangeText={(txt) => setEmail(txt)}
                                     value={email}
+                                    placeholderTextColor={
+                                        reduxThemeData
+                                            ? COLOR.GREY : null
+                                    }
                                 />
                             </View>
                         </View>
                         <View style={styles.inputMainView}>
                             <TextLable
                                 title="Password"
-                                style={styles.blackText}
+                                style={{
+                                    color: reduxThemeData
+                                        ? COLOR.GREY
+                                        : COLOR.BLACK
+                                }}
                             />
-                            <View style={styles.inputView}>
+                            <View style={[styles.inputView, {
+                                backgroundColor: reduxThemeData
+                                    ? COLOR.DARK_BLUE_2
+                                    : COLOR.WHITE,
+                                borderWidth: reduxThemeData
+                                    ? 0.5 : 0.5,
+                                borderColor: reduxThemeData
+                                    ? COLOR.ORANGE : null,
+                                color: reduxThemeData
+                                    ? COLOR.GREY : null
+                            }]}>
                                 <CustomInput
                                     holder="Enter your password"
-                                    style={{ flex: 1 }}
+                                    style={{
+                                        flex: 1,
+                                        backgroundColor: reduxThemeData
+                                            ? COLOR.DARK_BLUE_2
+                                            : COLOR.WHITE,
+                                        color: reduxThemeData
+                                            ? COLOR.GREY : null
+                                    }}
                                     onChangeText={(txt) => setPassword(txt)}
                                     value={password}
                                     secureTextEntry={showPass}
+                                    placeholderTextColor={
+                                        reduxThemeData
+                                            ? COLOR.GREY : null
+                                    }
                                 />
                                 <CustomButton
                                     icon={
@@ -152,15 +251,40 @@ const Signup = ({ navigation }) => {
                         <View style={styles.inputMainView}>
                             <TextLable
                                 title="Confirm Password"
-                                style={styles.blackText}
+                                style={{
+                                    color: reduxThemeData
+                                        ? COLOR.GREY
+                                        : COLOR.BLACK
+                                }}
                             />
-                            <View style={styles.inputView}>
+                            <View style={[styles.inputView, {
+                                backgroundColor: reduxThemeData
+                                    ? COLOR.DARK_BLUE_2
+                                    : COLOR.WHITE,
+                                borderWidth: reduxThemeData
+                                    ? 0.5 : 0.5,
+                                borderColor: reduxThemeData
+                                    ? COLOR.ORANGE : null,
+                                color: reduxThemeData
+                                    ? COLOR.GREY : null
+                            }]}>
                                 <CustomInput
                                     holder="Enter your password"
-                                    style={{ flex: 1 }}
+                                    style={{
+                                        flex: 1,
+                                        backgroundColor: reduxThemeData
+                                            ? COLOR.DARK_BLUE_2
+                                            : COLOR.WHITE,
+                                        color: reduxThemeData
+                                            ? COLOR.GREY : null
+                                    }}
                                     onChangeText={(txt) => setConfirmPassword(txt)}
                                     value={confirmPassword}
                                     secureTextEntry={showPass}
+                                    placeholderTextColor={
+                                        reduxThemeData
+                                            ? COLOR.GREY : null
+                                    }
                                 />
                                 <CustomButton
                                     icon={
@@ -179,11 +303,14 @@ const Signup = ({ navigation }) => {
                                 title="Register"
                                 style={[ExternalStylesheet.btn, styles.signInButton]}
                                 fontstyle={styles.signInButtonText}
-                                onPress={() => register()}
+                                onPress={() => handleRegister()}
                             />
                             <View style={styles.registerView}>
                                 <TextLable
                                     title="Already have an account?"
+                                    style={{
+                                        color: reduxThemeData ? COLOR.GREY : null
+                                    }}
                                 />
                                 <CustomButton
                                     title="Sign In"
@@ -198,6 +325,8 @@ const Signup = ({ navigation }) => {
         </View>
     );
 };
+
+
 
 export default Signup;
 
@@ -238,6 +367,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'space-between',
+        marginVertical: 5,
     },
     signInButtonView: {
         marginTop: 25,
@@ -261,3 +391,4 @@ const styles = StyleSheet.create({
         marginHorizontal: 4
     },
 });
+

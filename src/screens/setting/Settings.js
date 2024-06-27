@@ -1,15 +1,35 @@
-import { StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
-import React, { useState } from 'react';
+import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import ExternalStylesheet from '../../enums/ExternalStylesheet';
-import Header from '../../components/custom/Header';
 import TextLable from '../../components/reusable/TextLable';
 import Svg from '../../assets/icons/svg';
 import CustomButton from '../../components/reusable/CustomButton';
 import { COLOR } from '../../enums/Styleguides';
+import HeaderWithBack from '../../components/custom/HeaderWithBack';
+import { useDispatch, useSelector } from 'react-redux';
+import { change_theme } from '../../redux/Actions';
+import DeleteAccount from '../settingDetails/DeleteAccount';
 
 const Settings = ({ navigation }) => {
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
+
+  const reduxThemeData = useSelector((state) => state.reducer)
+  console.log('theme===>', reduxThemeData)
+
+  const [isDarkTheme, setIsDarkTheme] = useState(reduxThemeData);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false)
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(change_theme(isDarkTheme))
+  }, [isDarkTheme])
+
+  useEffect(() => {
+    setIsDarkTheme(reduxThemeData)
+  }, [reduxThemeData])
+
+  const TEXTCOLOR = reduxThemeData ? COLOR.WHITE : COLOR.DARK_GREY_2
 
   const DATA = [
     {
@@ -50,19 +70,35 @@ const Settings = ({ navigation }) => {
     },
   ];
 
+  const handleDeleteAccount = () => {
+    console.warn('Account Deleted')
+    setDeleteModalVisible(false)
+  }
+  const handleCancelDeleteAccount = () => {
+    setDeleteModalVisible(false)
+  }
+
   return (
-    <View style={ExternalStylesheet.container}>
+    <View style={[ExternalStylesheet.container,
+    {
+      backgroundColor: reduxThemeData
+        ?
+        COLOR.DARK_BLUE
+        :
+        COLOR.WHITE
+    }]}>
       <View style={styles.innerContainer}>
-        <Header
-          title="Settings"
+        <HeaderWithBack
+          title={'Settings'}
+          onPress={() => navigation.goBack()}
         />
 
         <TextLable
           title="Account"
-          style={styles.sectionTitle}
+          style={[styles.sectionTitle, { color: TEXTCOLOR }]}
         />
         <View style={styles.accountContainer}>
-          <CustomButton style={styles.profileIcon}
+          <CustomButton style={[styles.profileIcon, { backgroundColor: reduxThemeData ? COLOR.ORANGE : COLOR.DARK_BLUE_2 }]}
             icon={
               <Svg.MaleIcon
                 height={70}
@@ -73,7 +109,7 @@ const Settings = ({ navigation }) => {
           <View style={styles.accountDetails}>
             <TextLable
               title="Burhan ud din"
-              style={styles.accountName}
+              style={[styles.accountName, { color: TEXTCOLOR }]}
             />
             <TextLable
               title="verified098@gmail.com"
@@ -83,14 +119,14 @@ const Settings = ({ navigation }) => {
               title="Profile"
               style={[ExternalStylesheet.btn, styles.profileButton]}
               fontstyle={styles.profileButtonText}
-              onPress={()=>navigation.navigate('EditProfile')}
+              onPress={() => navigation.navigate('EditProfile')}
             />
           </View>
         </View>
 
         <TextLable
           title="General"
-          style={styles.sectionTitle}
+          style={[styles.sectionTitle, { color: TEXTCOLOR }]}
         />
         <View>
           {
@@ -99,14 +135,18 @@ const Settings = ({ navigation }) => {
                 key={index}
                 style={styles.listItem}
                 onPress={() => {
-                  item?.screen ? navigation.navigate(item.screen) : null
+                  if (item.title == "Delete Account") {
+                    setDeleteModalVisible(true)
+                  } else {
+                    item?.screen ? navigation.navigate(item.screen) : null
+                  }
                 }}
               >
                 <View style={styles.listItemContent}>
                   {item.icon}
                   <TextLable
                     title={item.title}
-                    style={styles.listItemText}
+                    style={[styles.listItemText, { color: TEXTCOLOR }]}
                   />
                   {
                     (item.title === 'Change Theme' || item.title === 'Notifications') && (
@@ -135,6 +175,11 @@ const Settings = ({ navigation }) => {
           fontstyle={styles.logoutButtonText}
         />
       </View>
+      <DeleteAccount
+        visible={deleteModalVisible}
+        onDeletePress={handleDeleteAccount}
+        onCancelPress={handleCancelDeleteAccount}
+      />
     </View>
   );
 };
@@ -157,7 +202,6 @@ const styles = StyleSheet.create({
   profileIcon: {
     height: 100,
     width: 100,
-    backgroundColor: COLOR.DARK_BLUE_2,
     borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',

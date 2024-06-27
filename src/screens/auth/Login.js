@@ -7,6 +7,10 @@ import CustomButton from '../../components/reusable/CustomButton';
 import TextLable from '../../components/reusable/TextLable';
 import Svg from '../../assets/icons/svg';
 import Snackbar from 'react-native-snackbar';
+import { useSelector } from 'react-redux';
+import NetInfo from '@react-native-community/netinfo'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { KEYS } from '../../utils/keys';
 
 const Login = ({ navigation }) => {
 
@@ -18,10 +22,29 @@ const Login = ({ navigation }) => {
         setShowPass(!showPass)
     }
 
-    const handleLogin = async () => {
-        if (email && password) {
+    const reduxThemeData = useSelector((state) => state.reducer)
 
+    const handleLogin = () => {
+        {
+            NetInfo.fetch().then(state => {
+                if (!state.isConnected) {
+                    Snackbar.show({
+                        text: 'Internet Disconnected',
+                        duration: Snackbar.LENGTH_SHORT,
+                    });
+                    return;
+                }
+                loginRequest()
+            })
+        }
+    }
+
+    const loginRequest = async () => {
+
+        if (email && password) {
             try {
+                const player_id = 1
+
                 const response = await fetch('https://dailydoseofwisdom.net/api/login', {
                     method: 'POST',
                     headers: {
@@ -31,14 +54,18 @@ const Login = ({ navigation }) => {
                     body: JSON.stringify({
                         email: email,
                         password: password,
-                        player_id: 1
+                        player_id: player_id
                     })
                 })
                 const json = await response.json()
+                console.log('this is json==>', json)
                 if (json.success == true) {
                     navigation.navigate('Home')
+                    const jsonPlayerId = JSON.stringify(player_id)
+                    await AsyncStorage.setItem('@UserId', jsonPlayerId)
+                    await AsyncStorage.setItem(KEYS.AUTH_TOKEN, json.data.token)
                 }
-                else {
+                        else {
                     Snackbar.show({
                         text: "Invalid Credentials",
                         duration: Snackbar.LENGTH_SHORT,
@@ -67,7 +94,13 @@ const Login = ({ navigation }) => {
 
     return (
         <View style={ExternalStylesheet.container}>
-            <View style={styles.innerContainer}>
+            <View style={[styles.innerContainer, {
+                backgroundColor: reduxThemeData
+                    ?
+                    COLOR.DARK_BLUE
+                    :
+                    COLOR.WHITE
+            }]}>
                 <View style={styles.imgView}>
                     <Image
                         source={require('../../assets/images/app_icon.png')}
@@ -77,35 +110,87 @@ const Login = ({ navigation }) => {
                 <View style={styles.centeredView}>
                     <TextLable
                         title="Login to your account"
-                        style={styles.mainText}
+                        style={[styles.mainText, {
+                            color: reduxThemeData ? COLOR.GREY : COLOR.BLACK
+                        }]}
                     />
                     <View>
                         <View style={styles.inputMainView}>
                             <TextLable
                                 title="Email"
-                                style={styles.blackText}
+                                style={{
+                                    color: reduxThemeData
+                                        ? COLOR.GREY
+                                        : COLOR.BLACK
+                                }}
                             />
-                            <View style={styles.inputView}>
+                            <View style={[styles.inputView, {
+                                backgroundColor: reduxThemeData
+                                    ? COLOR.DARK_BLUE_2
+                                    : COLOR.WHITE,
+                                borderWidth: reduxThemeData
+                                    ? 0.5 : 0.5,
+                                borderColor: reduxThemeData
+                                    ? COLOR.ORANGE : null,
+                                color: reduxThemeData
+                                    ? COLOR.GREY : null
+                            }]}>
                                 <CustomInput
                                     holder="Enter your email"
-                                    style={{ flex: 1 }}
+                                    style={{
+                                        flex: 1,
+                                        backgroundColor: reduxThemeData
+                                            ? COLOR.DARK_BLUE_2
+                                            : COLOR.WHITE,
+                                        color: reduxThemeData
+                                            ? COLOR.GREY : null
+                                    }}
                                     onChangeText={(txt) => setEmail(txt)}
                                     value={email}
+                                    placeholderTextColor={
+                                        reduxThemeData
+                                            ? COLOR.GREY : null
+                                    }
                                 />
                             </View>
                         </View>
                         <View>
                             <TextLable
                                 title="Password"
-                                style={styles.blackText}
+                                style={{
+                                    color: reduxThemeData
+                                        ? COLOR.GREY
+                                        : COLOR.BLACK
+                                }}
                             />
-                            <View style={styles.inputView}>
+                            <View style={[styles.inputView, {
+                                backgroundColor: reduxThemeData
+                                    ? COLOR.DARK_BLUE_2
+                                    : COLOR.WHITE,
+                                borderWidth: reduxThemeData
+                                    ? 0.5 : 0.5,
+                                borderColor: reduxThemeData
+                                    ? COLOR.ORANGE : null,
+                                color: reduxThemeData
+                                    ? COLOR.GREY : null
+                            }]}>
                                 <CustomInput
                                     holder="Enter your password"
-                                    style={{ flex: 1 }}
+                                    style={{
+                                        flex: 1,
+                                        backgroundColor: reduxThemeData
+                                            ? COLOR.DARK_BLUE_2
+                                            : COLOR.WHITE,
+                                        color: reduxThemeData
+                                            ? COLOR.GREY : null
+                                    }}
                                     onChangeText={(txt) => setPassword(txt)}
                                     value={password}
                                     secureTextEntry={showPass}
+                                    placeholderTextColor={
+                                        reduxThemeData
+                                            ? COLOR.GREY : null
+                                    }
                                 />
                                 <CustomButton
                                     icon={
@@ -124,7 +209,7 @@ const Login = ({ navigation }) => {
                                 title="Forgot Password?"
                                 style={styles.forgotPasswordButton}
                                 fontstyle={styles.forgotPasswordText}
-                                onPress={()=>navigation.navigate('ForgotPassword')}
+                                onPress={() => navigation.navigate('ForgotPassword')}
                             />
                         </View>
                         <View style={styles.signInButtonView}>
@@ -137,6 +222,9 @@ const Login = ({ navigation }) => {
                             <View style={styles.registerView}>
                                 <TextLable
                                     title="Don't have an account?"
+                                    style={{
+                                        color: reduxThemeData ? COLOR.GREY : null
+                                    }}
                                 />
                                 <CustomButton
                                     title="Register"
@@ -173,11 +261,7 @@ const styles = StyleSheet.create({
     },
     mainText: {
         fontWeight: 'bold',
-        color: COLOR.BLACK,
         fontSize: 17
-    },
-    blackText: {
-        color: COLOR.BLACK,
     },
     inputMainView: {
         marginVertical: 10,
@@ -186,8 +270,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '100%',
         height: 50,
-        paddingHorizontal: 15,
-        borderWidth: 0.5,
+        paddingHorizontal: 10,
         borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'space-between',

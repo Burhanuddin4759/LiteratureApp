@@ -8,6 +8,7 @@ import { COLOR } from '../../enums/Styleguides'
 import Preferences from './Preferences'
 import AddStory from './AddStory'
 import Indicator from '../../components/custom/Indicator'
+import { useSelector } from 'react-redux'
 
 const HorizonCategories = ({ route }) => {
 
@@ -31,6 +32,8 @@ const HorizonCategories = ({ route }) => {
 
     const [showIndicator, setShowIndicator] = useState(true)
     const [subCategories, setSubCategories] = useState([])
+
+    const reduxThemeData = useSelector((state) => state.reducer)
 
     const getHorizonCategories = async () => {
         try {
@@ -60,12 +63,16 @@ const HorizonCategories = ({ route }) => {
         <View style={ExternalStylesheet.container}>
 
 
-            <View style={styles.innerContainer}>
+            <View style={[styles.innerContainer, {
+                backgroundColor: reduxThemeData ? COLOR.DARK_BLUE : COLOR.WHITE
+            }]}>
                 <Header
                     onPress={() => navigation.navigate('Settings')}
                     title={'Daily Dose of Wisdom'}
                 />
-                <View style={styles.topBtns}>
+                <View style={[styles.topBtns, {
+                    backgroundColor: reduxThemeData ? COLOR.BLUE : COLOR.WHITE
+                }]}>
                     <CustomButton
                         title={"Personal Preferences"}
                         style={[ExternalStylesheet.btn, { backgroundColor: show == 0 ? COLOR.LIGHT_GREY_2 : null, borderRadius: 15, flex: 1, height: 28, margin: 4 }]}
@@ -101,12 +108,12 @@ const styles = StyleSheet.create({
     innerContainer: {
         flex: 1,
         paddingHorizontal: 20,
-        backgroundColor: COLOR.LIGHT_GREY_2
+        // backgroundColor: COLOR.LIGHT_GREY_2
     },
     topBtns: {
         flexDirection: 'row',
         alignSelf: 'center',
-        backgroundColor: COLOR.WHITE,
+        // backgroundColor: COLOR.WHITE,
         height: 40,
         borderRadius: 20,
         elevation: 4,

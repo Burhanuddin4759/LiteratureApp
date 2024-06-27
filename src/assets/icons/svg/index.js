@@ -1,4 +1,5 @@
 import SettingIcon from '../svg/homeScreen/SettingIcon.svg'
+import WhiteSettingIcon from '../svg/homeScreen/WhiteSettingIcon.svg'
 import MaleIcon from '../svg/homeScreen/Male.svg'
 import UnBookmark from '../svg/storyScreen/UnBookmark.svg'
 import Clipboard from '../svg/storyScreen/ClipboardOutline.svg'
@@ -17,10 +18,14 @@ import MessageIcon from '../svg/settings/MessageIcon.svg'
 import Search from '../svg/settings/Search.svg'
 import ThemeIcon from '../svg/settings/ThemeIcon.svg'
 import NotificationIcon from '../svg/settings/NotificationIcon.svg'
+import BackArrow from '../svg/settings/BackArrow.svg'
+import BackArrowWhite from '../svg/settings/BackArrowWhite.svg'
+
 
 
 export default {
     SettingIcon,
+    WhiteSettingIcon,
     MaleIcon,
     UnBookmark,
     Clipboard,
@@ -38,5 +43,7 @@ export default {
     MessageIcon,
     Search,
     ThemeIcon,
-    NotificationIcon
+    NotificationIcon,
+    BackArrow,
+    BackArrowWhite
 }

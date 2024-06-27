@@ -6,7 +6,7 @@ import TextLable from '../reusable/TextLable'
 import { COLOR } from '../../enums/Styleguides'
 import { useSelector } from 'react-redux'
 
-const Header = (props) => {
+const HeaderWithBack = (props) => {
 
     const { onPress, title } = props
 
@@ -15,33 +15,32 @@ const Header = (props) => {
     return (
         <View style={styles.header}>
             <CustomButton
-                icon={reduxThemeData ? <Svg.WhiteSettingIcon /> : <Svg.SettingIcon />}
+                icon={reduxThemeData ? <Svg.BackArrowWhite /> : <Svg.BackArrow />}
                 onPress={onPress}
+                style={{ flex: 1 }}
             />
             <TextLable
                 title={title}
                 style={[styles.titleStyle, { color: reduxThemeData ? COLOR.WHITE : COLOR.BLACK }]}
             />
-            <CustomButton
-                icon={<Svg.MaleIcon height={26} width={26} />}
-            />
+            <View style={{ flex: 0.5 }}>
+            </View>
         </View>
     )
 }
 
-export default Header
+export default HeaderWithBack
 
 const styles = StyleSheet.create({
     header: {
         paddingVertical: 10,
-        height: 60,
+        height: 55,
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     titleStyle: {
         fontWeight: 'bold',
         fontSize: 17,
-        color: COLOR.BLACK
+        flex: 1.5,
     }
 })

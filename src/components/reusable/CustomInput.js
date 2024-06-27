@@ -3,7 +3,7 @@ import React from 'react'
 import ExternalStylesheet from '../../enums/ExternalStylesheet'
 
 const CustomInput = (props) => {
-  const { holder, onChangeText, value,style, multiline, numberOfLines, secureTextEntry } = props
+  const { holder, onChangeText, value, style, multiline, numberOfLines, secureTextEntry, placeholderTextColor } = props
   return (
     <TextInput
       style={[ExternalStylesheet.input, style]}
@@ -13,6 +13,7 @@ const CustomInput = (props) => {
       multiline={multiline && multiline}
       numberOfLines={numberOfLines && numberOfLines}
       secureTextEntry={secureTextEntry && secureTextEntry}
+      placeholderTextColor={placeholderTextColor && placeholderTextColor}
     />
   )
 }

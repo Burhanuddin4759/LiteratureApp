@@ -1,8 +1,10 @@
-import { ADD_HORIZON_CATEGORIES } from "./Constants";
+import { CHANGE_THEME } from "./Constants";
 
-export function addHorizonCategories(item) {
+
+export function change_theme(isDarkMode) {
     return {
-        type: ADD_HORIZON_CATEGORIES,
-        data: item
+        type: CHANGE_THEME,
+        data: isDarkMode
     }
 }
+

@@ -1,1 +1,1 @@
-export const ADD_HORIZON_CATEGORIES = 'add_horizon_categories' 
+export const CHANGE_THEME = 'change_theme'

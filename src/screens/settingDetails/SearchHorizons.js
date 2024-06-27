@@ -8,11 +8,15 @@ import TextLable from '../../components/reusable/TextLable';
 import CustomButton from '../../components/reusable/CustomButton';
 import Svg from '../../assets/icons/svg';
 import Indicator from '../../components/custom/Indicator';
+import HeaderWithBack from '../../components/custom/HeaderWithBack';
+import { useSelector } from 'react-redux';
 
-const SearchHorizons = () => {
+const SearchHorizons = ({ navigation }) => {
     const [words, setWords] = useState('');
     const [searchData, setSearchData] = useState([]);
     const [showIndicator, setShowIndicator] = useState(false)
+
+    const reduxThemeData = useSelector((state) => state.reducer)
 
     const getSearchData = async () => {
         setShowIndicator(true)
@@ -77,14 +81,44 @@ const SearchHorizons = () => {
 
     return (
         <View style={ExternalStylesheet.container}>
-            <View style={styles.innerContainer}>
-                <Header title={'Daily Dose of Wisdom'} />
-                <View style={styles.searchInput}>
+            <View style={[styles.innerContainer, {
+                backgroundColor: reduxThemeData ? COLOR.DARK_BLUE : COLOR.WHITE
+            }]}>
+                <HeaderWithBack
+                    title={'Daily Dose of Wisdom'}
+                    onPress={() => navigation.goBack()}
+                />
+                <View style={[styles.searchInput, {
+                    backgroundColor: reduxThemeData
+                        ?
+                        COLOR.DARK_BLUE_2
+                        :
+                        COLOR.WHITE,
+                    borderWidth: reduxThemeData
+                        ? 1 : 0.5,
+                    borderColor: reduxThemeData
+                        ? COLOR.ORANGE : null,
+                    color: reduxThemeData
+                        ? COLOR.GREY : null
+                }]}>
                     <CustomInput
                         holder={'Search here...'}
-                        style={ExternalStylesheet.input}
+                        style={[ExternalStylesheet.input, {
+                            flex: 1,
+                            backgroundColor: reduxThemeData
+                                ?
+                                COLOR.DARK_BLUE_2
+                                :
+                                COLOR.WHITE,
+                            color: reduxThemeData
+                                ? COLOR.GREY : null
+                        }]}
                         onChangeText={(txt) => setWords(txt)}
                         value={words}
+                        placeholderTextColor={
+                            reduxThemeData
+                                ? COLOR.GREY : null
+                        }
                     />
                     <CustomButton
                         icon={<Svg.Search />}
@@ -101,7 +135,7 @@ const SearchHorizons = () => {
                             <FlatList
                                 showsVerticalScrollIndicator={false}
                                 data={searchData}
-                                renderItem={({ item }) => <RenderView item={item} />}
+                                renderItem={RenderView}
                                 numColumns={2}
                                 keyExtractor={(item) => item.id.toString()}
                             />

@@ -4,14 +4,16 @@ import ExternalStylesheet from '../../enums/ExternalStylesheet'
 import Svg from '../../assets/icons/svg'
 import TextLable from '../../components/reusable/TextLable'
 import { COLOR } from '../../enums/Styleguides'
-import CustomButton from '../../components/reusable/CustomButton'
 import Header from '../../components/custom/Header'
 import Indicator from '../../components/custom/Indicator'
+import { useSelector } from 'react-redux'
 
 const Home = ({ navigation }) => {
 
     const [data, setData] = useState([])
     const [showIndicator, setShowIndicator] = useState(true)
+
+    const reduxThemeData = useSelector((state) => state.reducer)
 
     const getData = async () => {
         const fetchData = await fetch('https://dailydoseofwisdom.net/api/get-all-categories', {
@@ -32,7 +34,15 @@ const Home = ({ navigation }) => {
     const renderView = ({ item }) => {
         // console.log('item====>', item)
         return (
-            <TouchableOpacity style={styles.item}
+            <TouchableOpacity style={[styles.item, {
+                backgroundColor: reduxThemeData
+                    ?
+                    COLOR.DARK_BLUE_2
+                    :
+                    COLOR.WHITE,
+                borderWidth: reduxThemeData ? 1 : null,
+                borderColor: reduxThemeData ? COLOR.GREY : null
+            }]}
                 onPress={() => navigation.navigate('SubCategories', { item_id: item.id })}
             >
                 <Image
@@ -41,7 +51,14 @@ const Home = ({ navigation }) => {
                 />
                 <TextLable
                     title={item.name}
-                    style={{ fontSize: 16, fontWeight: 'bold', color: COLOR.BLACK }}
+                    style={{
+                        fontSize: 16, fontWeight: 'bold',
+                        color: reduxThemeData
+                            ?
+                            COLOR.WHITE
+                            :
+                            COLOR.BLACK
+                    }}
                 />
                 <TextLable
                     title={`${item.subCategories.length} items`}
@@ -52,7 +69,13 @@ const Home = ({ navigation }) => {
     }
 
     return (
-        <View style={ExternalStylesheet.container}>
+        <View style={[ExternalStylesheet.container, {
+            backgroundColor: reduxThemeData
+                ?
+                COLOR.DARK_BLUE
+                :
+                COLOR.WHITE
+        }]}>
             {
                 showIndicator
                     ?
@@ -83,7 +106,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20
     },
     item: {
-        backgroundColor: '#fff',
+        // backgroundColor: '#fff',
         elevation: 4,
         flex: 1,
         height: Dimensions.get('screen').width / 2.25,

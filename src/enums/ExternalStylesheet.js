@@ -6,7 +6,7 @@ const ExternalStylesheet = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor:COLOR.WHITE
+        // backgroundColor:COLOR.WHITE
     },
     btn:{
         justifyContent:'center',

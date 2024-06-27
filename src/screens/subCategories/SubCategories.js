@@ -21,6 +21,8 @@ const SubCategories = ({ route }) => {
         )
     }
 
+    const reduxThemeData = useSelector((state) => state.reducer)
+
     const [subCategories, setSubCategories] = useState([])
     // console.log(storiesQty)
 
@@ -46,7 +48,15 @@ const SubCategories = ({ route }) => {
 
     const renderView = ({ item }) => {
         return (
-            <TouchableOpacity style={styles.item}
+            <TouchableOpacity style={[styles.item, {
+                backgroundColor: reduxThemeData
+                    ?
+                    COLOR.DARK_BLUE_2
+                    :
+                    COLOR.WHITE,
+                borderWidth: reduxThemeData ? 1 : null,
+                borderColor: reduxThemeData ? COLOR.GREY : null
+            }]}
                 onPress={() =>
                     subCategory(item.id)
                 }
@@ -57,7 +67,14 @@ const SubCategories = ({ route }) => {
                 />
                 <TextLable
                     title={item.name}
-                    style={{ fontSize: 16, fontWeight: 'bold', color: COLOR.BLACK }}
+                    style={{
+                        fontSize: 16, fontWeight: 'bold', color:
+                            reduxThemeData
+                                ?
+                                COLOR.WHITE
+                                :
+                                COLOR.BLACK
+                    }}
                 />
                 <TextLable
                     title={`${item.stories} stories`}
@@ -69,7 +86,9 @@ const SubCategories = ({ route }) => {
     }
 
     return (
-        <View style={ExternalStylesheet.container}>
+        <View style={[ExternalStylesheet.container, {
+            backgroundColor: reduxThemeData ? COLOR.DARK_BLUE : COLOR.WHITE
+        }]}>
             <View style={styles.innerContainer}>
                 <Header
                     onPress={() => navigation.navigate('Settings')}
@@ -94,7 +113,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20
     },
     item: {
-        backgroundColor: '#fff',
+        // backgroundColor: '#fff',
         elevation: 4,
         flex: 1,
         height: Dimensions.get('screen').width / 2.25,

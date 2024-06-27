@@ -3,8 +3,24 @@ import React from 'react'
 import ExternalStylesheet from '../../enums/ExternalStylesheet'
 import CustomButton from '../../components/reusable/CustomButton'
 import { COLOR } from '../../enums/Styleguides'
+import NetInfo from '@react-native-community/netinfo'
+import Snackbar from 'react-native-snackbar'
 
 const SplashScreen = ({ navigation }) => {
+
+    const handleGuestLogin = () => {
+        NetInfo.fetch().then((state) => {
+            if (!state.isConnected) {
+                Snackbar.show({
+                    text: 'Internet Disconnected'
+                })
+            }
+            else {
+                navigation.navigate('Home')
+            }
+        })
+    }
+
     return (
         <ImageBackground
             source={require('../../assets/images/SplashScreen/Splash.png')}
@@ -26,7 +42,7 @@ const SplashScreen = ({ navigation }) => {
                     title={'Continue as guest'}
                     style={styles.guestBtn}
                     fontstyle={styles.guestText}
-                    onPress={()=>navigation.navigate('Home')}
+                    onPress={handleGuestLogin}
                 />
             </View>
             <Text style={{}}></Text>
@@ -44,7 +60,7 @@ const styles = StyleSheet.create({
     img: {
         resizeMode: 'center',
         height: '20%',
-        alignSelf:'center'
+        alignSelf: 'center'
     },
     guestBtn: {
         marginVertical: 8
