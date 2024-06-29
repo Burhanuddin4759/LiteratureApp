@@ -1,22 +1,121 @@
-import { Animated, Dimensions, FlatList, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useRef, useState } from 'react'
+import { Dimensions, FlatList, ScrollView, Share, StyleSheet, View } from 'react-native'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import CustomButton from '../../components/reusable/CustomButton'
 import { COLOR } from '../../enums/Styleguides'
 import ExternalStylesheet from '../../enums/ExternalStylesheet'
 import Svg from '../../assets/icons/svg'
 import TextLable from '../../components/reusable/TextLable'
 import { useSelector } from 'react-redux'
+import Clipboard from '@react-native-clipboard/clipboard'
+import Snackbar from 'react-native-snackbar'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { KEYS } from '../../utils/keys'
 
 const Preferences = (props) => {
 
-    const { subCategories } = props
+    const { subCategories, againCall } = props
     // console.log('This is Props', subCategories)
+
+    const [user_id, setUserId] = useState('')
+    const [token, setToken] = useState('')
+    const [guestMode, SetGuestMode] = useState(false)
+
+    useEffect(() => {
+        getUserIdandToken()
+    }, [user_id, token])
+
+    const getUserIdandToken = async () => {
+        const user_id = await AsyncStorage.getItem('@UserId')
+        const token = await AsyncStorage.getItem(KEYS.AUTH_TOKEN)
+        const jsonParseID = JSON.parse(user_id)
+        if (token && jsonParseID) {
+            setUserId(jsonParseID)
+            setToken(token)
+        }
+        else {
+            SetGuestMode(true)
+        }
+        // console.log('=-=-=-==-=', token, user_id)
+    }
 
     const flatListRef = useRef(null)
     const reduxThemeData = useSelector((state) => state.reducer)
 
+    const copyClipboard = (description) => {
+        Clipboard.setString(description)
+        Snackbar.show({
+            text: 'Copied'
+        })
+    }
+
+    const shareItem = useCallback(async (item) => {
+        try {
+            await Share.share({
+                message: `${item.name}\n\n${item.description}`
+            })
+        } catch (error) {
+            console.log('error while sharing', error)
+        }
+    }, [])
+
+    const handleLike = async (item) => {
+        if (guestMode == true) {
+            Snackbar.show({
+                text: 'First Signup',
+            })
+        }
+        else {
+            const horizon_id = item.id
+            // console.log('this item is liked===>', item)
+            console.log(user_id, item?.id)
+            try {
+                const response = await fetch('https://dailydoseofwisdom.net/api/like-horizon', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        user_id: user_id,
+                        horizon_id: horizon_id
+                    })
+                })
+                const json = await response.json()
+                console.log(json)
+                console.log('like===>', json)
+                againCall()
+            } catch (error) {
+                console.log('Error while liking', error)
+            }
+        }
+    }
+
+    // const handleFav = async (id) => {
+    //     const horizon_id = id
+    //     try {
+    //         const response = await fetch('https://dailydoseofwisdom.net/api/favorite-horizon', {
+    //             method: 'POST',
+    //             headers: {
+    //                 Accept: 'application/json',
+    //                 'Content-Type': 'application/json',
+    //                 Authorization: `Bearer ${token}`
+    //             },
+    //             body: JSON.stringify({
+    //                 user_id: user_id,
+    //                 horizon_id: horizon_id
+    //             })
+    //         })
+    //         const json = await response.json()
+    //         console.log('Fav===>', json)
+    //     } catch (error) {
+    //         console.log('Error while Add to Fav', error)
+    //     }
+    // }
+
     const renderView = ({ item, index }) => {
-        // console.log('item===>', item)
+        // console.log('This is whole item likes==>', item.like)
+
         return (
             <View style={styles.itemContainer}>
                 <View style={[styles.container, {
@@ -69,24 +168,27 @@ const Preferences = (props) => {
                             <CustomButton
                                 icon={<Svg.UnBookmark height={18} width={18} />}
                                 style={{ marginHorizontal: 2, }}
+                            // onPress={() => handleFav(item)}
                             />
                             <CustomButton
-                                icon={
-                                    item.like == false
-                                        ?
-                                        <Svg.Heart height={18} width={18} />
-                                        :
-                                        <Svg.RedHeart height={18} width={18} />
+                                icon={item?.like
+                                    ?
+                                    <Svg.RedHeart height={18} width={18} />
+                                    :
+                                    <Svg.Heart height={18} width={18} />
                                 }
                                 style={{ marginHorizontal: 2 }}
+                                onPress={() => handleLike(item)}
                             />
                             <CustomButton
                                 icon={<Svg.Share height={18} width={18} />}
                                 style={{ marginHorizontal: 2 }}
+                                onPress={() => shareItem(item)}
                             />
                             <CustomButton
                                 icon={<Svg.Clipboard height={18} width={18} />}
                                 style={{ marginLeft: 2 }}
+                                onPress={() => copyClipboard(item.description)}
                             />
                         </View>
                     </View>
@@ -116,6 +218,9 @@ const Preferences = (props) => {
             </View>
         )
     }
+
+    // console.log(jsonRes)
+    // console.log(JSON.stringify(subCategories[0]))
 
     return (
         <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>

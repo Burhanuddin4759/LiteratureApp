@@ -9,6 +9,7 @@ import Preferences from './Preferences'
 import AddStory from './AddStory'
 import Indicator from '../../components/custom/Indicator'
 import { useSelector } from 'react-redux'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const HorizonCategories = ({ route }) => {
 
@@ -18,6 +19,7 @@ const HorizonCategories = ({ route }) => {
     const navigation = useNavigation()
 
     const [show, setShow] = useState(0)
+    const [user_id, setUserId] = useState('')
 
     const preferences = () => {
         setShow(0)
@@ -28,14 +30,24 @@ const HorizonCategories = ({ route }) => {
 
     useEffect(() => {
         getHorizonCategories()
-    }, [route.params])
+        getUserIdandToken()
+    }, [])
 
     const [showIndicator, setShowIndicator] = useState(true)
     const [subCategories, setSubCategories] = useState([])
 
     const reduxThemeData = useSelector((state) => state.reducer)
 
-    const getHorizonCategories = async () => {
+    // console.log(category_id, sub_category_id)
+
+    const getUserIdandToken = async() => {
+        const response = await AsyncStorage.getItem('@UserId')
+        const jsonParseID = JSON.parse(response)
+        // console.log('this is user id====>',jsonParseID)
+        setUserId(jsonParseID)
+    }
+
+    const getHorizonCategories = async (random) => {
         try {
             const response = await fetch('https://dailydoseofwisdom.net/api/get-all-horizons-by-category', {
                 method: 'POST',
@@ -45,11 +57,15 @@ const HorizonCategories = ({ route }) => {
                 },
                 body: JSON.stringify({
                     category_id: category_id,
-                    sub_category_id: sub_category_id
+                    sub_category_id: sub_category_id,
+                    user_id:user_id,
+                    random:random
+                    // user ID bhyj kr dekhni hai, asal app main yahan userID bhyji hui h
+                    // or random bhyja hua h
                 })
             })
             const json = await response.json()
-            // console.log('Post Response===>', json)
+            // console.log('Post Response===>', json.data)
             setSubCategories(json.data)
             setShowIndicator(false)
 
@@ -91,9 +107,13 @@ const HorizonCategories = ({ route }) => {
                                 ?
                                 <Preferences
                                     subCategories={subCategories}
+                                    againCall={()=>getHorizonCategories()}
                                 />
                                 :
-                                <AddStory />
+                                <AddStory
+                                    category_id={category_id}
+                                    sub_category_id={sub_category_id}
+                                />
                         )
                 }
             </View>

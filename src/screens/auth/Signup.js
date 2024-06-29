@@ -53,13 +53,14 @@ const Signup = ({ navigation }) => {
                 const json = await response.json()
                 // console.log('json===>', json)
                 if (json.success === true) {
+                    setEmail('') || setConfirmPassword('') || setFullName('') || setPassword('')
                     Snackbar.show({
                         text: 'User registered successfully',
                         duration: Snackbar.LENGTH_SHORT,
                         action: {
-                            text: 'undo',
+                            text: 'Login?',
                             textColor: COLOR.ORANGE,
-                            onPress: () => Snackbar.dismiss()
+                            onPress: () => navigation.navigate('Login')
                         }
                     })
                 }

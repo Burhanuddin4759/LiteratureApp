@@ -9,6 +9,9 @@ import HeaderWithBack from '../../components/custom/HeaderWithBack';
 import { useDispatch, useSelector } from 'react-redux';
 import { change_theme } from '../../redux/Actions';
 import DeleteAccount from '../settingDetails/DeleteAccount';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { KEYS } from '../../utils/keys';
+import Snackbar from 'react-native-snackbar';
 
 const Settings = ({ navigation }) => {
 
@@ -18,6 +21,11 @@ const Settings = ({ navigation }) => {
   const [isDarkTheme, setIsDarkTheme] = useState(reduxThemeData);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false)
+  const [guestMode, setGuestMode] = useState(false)
+  const [user_id, setUserId] = useState('')
+  const [user, setUser] = useState([])
+
+
 
   const dispatch = useDispatch()
 
@@ -28,6 +36,24 @@ const Settings = ({ navigation }) => {
   useEffect(() => {
     setIsDarkTheme(reduxThemeData)
   }, [reduxThemeData])
+
+  useEffect(() => {
+    userDetails()
+  }, [])
+
+  const userDetails = async () => {
+    const token = await AsyncStorage.getItem(KEYS.AUTH_TOKEN)
+    const userId = await AsyncStorage.getItem('@UserId')
+    const user = await AsyncStorage.getItem('@User')
+    const jsonParseUser = JSON.parse(user)
+    const jsonParseID = JSON.parse(userId)
+    if (token == null && jsonParseID == null) {
+      setGuestMode(true)
+    } else {
+      setUserId(jsonParseID)
+      setUser(jsonParseUser)
+    }
+  }
 
   const TEXTCOLOR = reduxThemeData ? COLOR.WHITE : COLOR.DARK_GREY_2
 
@@ -70,12 +96,39 @@ const Settings = ({ navigation }) => {
     },
   ];
 
-  const handleDeleteAccount = () => {
-    console.warn('Account Deleted')
+  const handleDeleteAccount = async () => {
     setDeleteModalVisible(false)
+    try {
+      const resposnse = await fetch('https://dailydoseofwisdom.net/api/delete-account', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user_id
+        })
+      })
+      const jsonRes = await resposnse.json()
+      if (jsonRes.success == true) {
+        Snackbar.show({
+          text: 'Account deleted succesfully'
+        })
+        await AsyncStorage.clear()
+        navigation.navigate('Login')
+      }
+      console.log('Deleting account===>', jsonRes)
+    } catch (error) {
+      console.log('Error while deleting account')
+    }
   }
   const handleCancelDeleteAccount = () => {
     setDeleteModalVisible(false)
+  }
+
+  const handleLogout = async () => {
+    await AsyncStorage.clear()
+    navigation.navigate('Splash')
   }
 
   return (
@@ -108,18 +161,24 @@ const Settings = ({ navigation }) => {
           />
           <View style={styles.accountDetails}>
             <TextLable
-              title="Burhan ud din"
+              title={guestMode ? "Guest Mode" : user.full_name}
               style={[styles.accountName, { color: TEXTCOLOR }]}
             />
             <TextLable
-              title="verified098@gmail.com"
+              title={guestMode ? 'no mail' : user.email}
               style={styles.accountEmail}
             />
             <CustomButton
               title="Profile"
               style={[ExternalStylesheet.btn, styles.profileButton]}
               fontstyle={styles.profileButtonText}
-              onPress={() => navigation.navigate('EditProfile')}
+              onPress={() => {
+                guestMode
+                  ? Snackbar.show({
+                    text: 'Guest mode has no profile'
+                  })
+                  : navigation.navigate('EditProfile')
+              }}
             />
           </View>
         </View>
@@ -136,9 +195,31 @@ const Settings = ({ navigation }) => {
                 style={styles.listItem}
                 onPress={() => {
                   if (item.title == "Delete Account") {
-                    setDeleteModalVisible(true)
-                  } else {
-                    item?.screen ? navigation.navigate(item.screen) : null
+                    guestMode
+                      ?
+                      Snackbar.show({
+                        text: 'GuestMode has no account to delete'
+                      })
+                      :
+                      setDeleteModalVisible(true)
+                  }
+                  else if (item?.screen == "SearchHorizons") {
+                    navigation.navigate(item.screen)
+                  }
+                  else if (item?.screen == "AboutUs") {
+                    navigation.navigate(item.screen)
+                  }
+                  else if (item?.screen == "Suggestion") {
+                    navigation.navigate(item.screen, { user: user })
+                  }
+                  else {
+                    guestMode
+                      ?
+                      Snackbar.show({
+                        text: 'First Signup'
+                      })
+                      :
+                      item?.screen ? navigation.navigate(item.screen) : null
                   }
                 }}
               >
@@ -173,6 +254,7 @@ const Settings = ({ navigation }) => {
           icon={<Svg.Logout height={20} width={20} />}
           style={[ExternalStylesheet.btn, styles.logoutButton]}
           fontstyle={styles.logoutButtonText}
+          onPress={handleLogout}
         />
       </View>
       <DeleteAccount
@@ -180,7 +262,7 @@ const Settings = ({ navigation }) => {
         onDeletePress={handleDeleteAccount}
         onCancelPress={handleCancelDeleteAccount}
       />
-    </View>
+    </View >
   );
 };
 

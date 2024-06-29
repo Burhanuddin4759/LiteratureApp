@@ -7,9 +7,8 @@ import { COLOR } from '../../enums/Styleguides'
 import TextLable from '../../components/reusable/TextLable'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { KEYS } from '../../utils/keys'
-import CustomButton from '../../components/reusable/CustomButton'
 
-const FavouriteLibrary = () => {
+const FavouriteLibrary = ({navigation}) => {
 
   const reduxThemeData = useSelector((state) => state.reducer)
 
@@ -35,11 +34,16 @@ const FavouriteLibrary = () => {
     const jsonParseID = JSON.parse(userId)
     // console.log('Token===>', token)
     // console.log('userID===>', jsonParseID)
-    setUserId(jsonParseID)
-    setToken(token)
+    if (userId == null && token == null) {
+      setEmptyData(true)
+    } else {
+      setUserId(jsonParseID)
+      setToken(token)
+    }
   }
 
   const getFavouriteData = async () => {
+    // console.log(token)
     try {
       const response = await fetch('https://dailydoseofwisdom.net/api/list-of-fav-horizons', {
         method: 'POST',
@@ -80,6 +84,7 @@ const FavouriteLibrary = () => {
       }]}>
         <Header
           title={'Favourites'}
+          onPress={()=>navigation.goBack()}
         />
         {
           emptyData
@@ -92,10 +97,6 @@ const FavouriteLibrary = () => {
             </View>
             :
             <View style={styles.resultsContainer}>
-              <CustomButton
-                title={'Get Fav'}
-                onPress={getFavouriteData}
-              />
               <FlatList
                 showsVerticalScrollIndicator={false}
                 data={favData}

@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import NetInfo from '@react-native-community/netinfo'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { KEYS } from '../../utils/keys';
+import { En } from '../../locales/En';
 
 const Login = ({ navigation }) => {
 
@@ -60,12 +61,15 @@ const Login = ({ navigation }) => {
                 const json = await response.json()
                 console.log('this is json==>', json)
                 if (json.success == true) {
+                    setEmail('') || setPassword('')
                     navigation.navigate('Home')
-                    const jsonPlayerId = JSON.stringify(player_id)
+                    const jsonPlayerId = JSON.stringify(json.data.user.id)
                     await AsyncStorage.setItem('@UserId', jsonPlayerId)
-                    await AsyncStorage.setItem(KEYS.AUTH_TOKEN, json.data.token)
+                    const jsonPlayer = JSON.stringify(json.data.user)
+                    await AsyncStorage.setItem('@User', jsonPlayer)
+                    await AsyncStorage.setItem(KEYS.AUTH_TOKEN, json.data.token) //doubted
                 }
-                        else {
+                else {
                     Snackbar.show({
                         text: "Invalid Credentials",
                         duration: Snackbar.LENGTH_SHORT,
@@ -109,7 +113,7 @@ const Login = ({ navigation }) => {
                 </View>
                 <View style={styles.centeredView}>
                     <TextLable
-                        title="Login to your account"
+                        title={En.loginTitle}
                         style={[styles.mainText, {
                             color: reduxThemeData ? COLOR.GREY : COLOR.BLACK
                         }]}
